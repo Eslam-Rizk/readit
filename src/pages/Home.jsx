@@ -32,7 +32,7 @@ export default function Home() {
       try {
         // Add artificial delay before making the request
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        const res = await axios.get(`http://localhost:3000/posts`);
+        const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/posts`);
         setPosts(res.data);
         setPostsLoading(false);
         if (user) getUserPosts(res.data);
@@ -43,7 +43,7 @@ export default function Home() {
     async function getFollowings(id) {
       try {
         const res = await axios.get(
-          `http://localhost:3000/followings?userId=${id}`
+          `${process.env.REACT_APP_SERVER_URL}/followings?userId=${id}`
         );
         console.log("following:", res.data.length);
         setFollowing(res.data.length);
@@ -54,7 +54,7 @@ export default function Home() {
     async function getFollowers(id) {
       try {
         const res = await axios.get(
-          `http://localhost:3000/followings?followingId=${id}`
+          `${process.env.REACT_APP_SERVER_URL}/followings?followingId=${id}`
         );
         console.log("followers:", res.data.length);
         setFollowers(res.data.length);
@@ -64,7 +64,7 @@ export default function Home() {
     }
     async function getMedia() {
       try {
-          `http://localhost:3000/images?userId=${id}`
+          `${process.env.REACT_APP_SERVER_URL}/images?userId=${id}`
       } catch (error) {
         
       }

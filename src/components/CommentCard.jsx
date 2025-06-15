@@ -9,7 +9,7 @@ export default function CommentCard({ comment }) {
     async function getCommentImages(id) {
       try {
         const res = await axios.get(
-          `http://localhost:3000/images?type=comments&cardId=${id}`
+          `${process.env.REACT_APP_SERVER_URL}/images?type=comments&cardId=${id}`
         );
         setImgs(res.data);
       } catch (error) {

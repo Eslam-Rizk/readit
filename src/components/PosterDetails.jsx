@@ -35,7 +35,7 @@ export default function PosterDetails({ userName, date, userId }) {
   useEffect(() => {
     async function getUserImage() {
       try {
-        const res = await axios.get(`http://localhost:3000/users?id=${userId}`);
+        const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/users?id=${userId}`);
         setUserImage(res.data[0].avatar);
       } catch (error) {
         console.error("error fetching user image");

@@ -48,7 +48,7 @@ export default function Register() {
     try {
       // Check if email already exists
       const res = await axios.get(
-        "http://localhost:3000/users",
+        `${process.env.REACT_APP_SERVER_URL}/users`,
         { params: { email: data.email } }
       );
       if (res.data.length > 0) {
@@ -57,7 +57,7 @@ export default function Register() {
       }
 
       // Register user
-      await axios.post("http://localhost:3000/register", {
+      await axios.post(`${process.env.REACT_APP_SERVER_URL}/register`, {
         name: data.name,
         email: data.email,
         password: data.password,

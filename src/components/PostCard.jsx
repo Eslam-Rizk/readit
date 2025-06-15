@@ -37,7 +37,7 @@ export default function PostCard({ post }) {
     async function getPostImages() {
       try {
         const res = await axios.get(
-          `http://localhost:3000/images?type=posts&cardId=${post.id}`
+          `${process.env.REACT_APP_SERVER_URL}/images?type=posts&cardId=${post.id}`
         );
         setPostImages(res.data);
       } catch (error) {
@@ -47,7 +47,7 @@ export default function PostCard({ post }) {
     async function getPostComments() {
       try {
         const res = await axios.get(
-          `http://localhost:3000/comments?postId=${post.id}`
+          `${process.env.REACT_APP_SERVER_URL}/comments?postId=${post.id}`
         );
         setComments(res.data);
       } catch (error) {
