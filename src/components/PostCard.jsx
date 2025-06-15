@@ -80,25 +80,27 @@ export default function PostCard({ user, post, posts, setPosts }) {
         console.error("Error submitting comment");
         return;
       }
-    }
-    if (commentImage && commentImage.startsWith("http")) {
-      try {
-        const res = await axios.post(`${apiUrl}/images`, {
-          type: "comments",
-          cardId: comment.id,
-          userId: user.id,
-          url: commentImage,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-      } catch (error) {
-        console.error("Error submitting comment");
-        return;
+      if (commentImage && commentImage.startsWith("http")) {
+        console.log("image added", commentImage);
+
+        try {
+          const res = await axios.post(`${apiUrl}/images`, {
+            type: "comments",
+            cardId: comment.id,
+            userId: user.id,
+            url: commentImage,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        } catch (error) {
+          console.error("Error submitting comment");
+          return;
+        }
       }
+      setComments((prev) => [...prev, comment]);
+      setCommentBody("");
+      setCommentImage(null);
     }
-    setComments((prev) => [...prev, comment]);
-    setCommentBody("");
-    setCommentImage(null);
   }
 
   return (

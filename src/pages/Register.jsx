@@ -28,12 +28,6 @@ const schema = z
     path: ["confirmPassword"],
   });
 
-// Dummy users data [TODO]: replace with real data
-const dummyUsers = [
-  { email: "test1@example.com", name: "Test One", password: "password1" },
-  { email: "test2@example.com", name: "Test Two", password: "password2" },
-];
-
 export default function Register() {
   const navigate = useNavigate();
   const {

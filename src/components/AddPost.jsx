@@ -21,39 +21,41 @@ export default function AddPost({ type, user, setData }) {
 
   async function addPost() {
     let post;
-    try {
-      const res = await axios.post(`${apiUrl}/${type}`, {
-        body: text,
-        userId: user.id,
-        userName: user.name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      console.log(res.data);
-      post = res.data;
-    } catch (error) {
-      console.error("Error Adding post", error);
-      toast.error("Error adding post, please try again!");
-      return;
-    }
-    if (image) {
+    if (text || (image && image.startsWith("http"))) {
       try {
-        const res = await axios.post(`${apiUrl}/images`, {
-          type: type,
-          cardId: post.id,
+        const res = await axios.post(`${apiUrl}/${type}`, {
+          body: text,
           userId: user.id,
-          url: image,
+          userName: user.name,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
         console.log(res.data);
+        post = res.data;
       } catch (error) {
         console.error("Error Adding post", error);
-        toast.error("Error adding post image, please try again!");
+        toast.error("Error adding post, please try again!");
         return;
       }
+      if (image && image.startsWith("http")) {
+        try {
+          const res = await axios.post(`${apiUrl}/images`, {
+            type: type,
+            cardId: post.id,
+            userId: user.id,
+            url: image,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+          console.log(res.data);
+        } catch (error) {
+          console.error("Error Adding post", error);
+          toast.error("Error adding post image, please try again!");
+          return;
+        }
+      }
+      setData((prev) => [post, ...prev]);
     }
-    setData((prev) => [post, ...prev]);
   }
   const handleSubmit = (e) => {
     e.preventDefault();

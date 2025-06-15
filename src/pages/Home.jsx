@@ -76,7 +76,7 @@ export default function Home() {
     async function getMedia(id) {
       try {
         const res = await axios.get(`${apiUrl}/images?userId=${id}`);
-        console.log("media:", res.data);
+        console.log("media for user:",user, res.data);
         setMedia(res.data);
       } catch (error) {
         console.error("error fetching media", error);
