@@ -4,8 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start:server": "json-server ../db.json -m ./node_modules/json-server-auth",
-    "dev": "concurrently \"vite\" \"npm run start:server\"",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

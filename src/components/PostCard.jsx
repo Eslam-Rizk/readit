@@ -76,7 +76,6 @@ export default function PostCard({ user, post, posts, setPosts }) {
           updatedAt: new Date(),
         });
         comment = res.data;
-        setComments((prev) => [...prev, res.data]);
       } catch (error) {
         console.error("Error submitting comment");
         return;
@@ -97,6 +96,7 @@ export default function PostCard({ user, post, posts, setPosts }) {
         return;
       }
     }
+    setComments((prev) => [...prev, comment]);
     setCommentBody("");
     setCommentImage(null);
   }
