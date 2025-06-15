@@ -11,12 +11,13 @@ import SubmitSVG from "./SubmitSVG";
 import CommentsSVG from "./CommentsSVG";
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function PostCard({ post, posts, setPosts }) {
+export default function PostCard({ user, post, posts, setPosts }) {
   const fileInputRef = useRef(null);
   const [postImages, setPostImages] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentImage, setCommentImage] = useState(null);
+  const [commentBody, setCommentBody] = useState("");
 
   async function toggleComments() {
     setShowComments(!showComments);
@@ -41,6 +42,7 @@ export default function PostCard({ post, posts, setPosts }) {
           `${apiUrl}/images?type=posts&cardId=${post.id}`
         );
         setPostImages(res.data);
+        console.log("postimages", res.data);
       } catch (error) {
         console.error("error fetching post images");
       }
@@ -56,6 +58,48 @@ export default function PostCard({ post, posts, setPosts }) {
     getPostImages();
     getPostComments();
   }, []);
+
+  // Handle comment submit
+  async function handleCommentSubmit(e) {
+    console.log("comment submit");
+
+    e.preventDefault();
+    let comment;
+    if (commentBody || (commentImage && commentImage.startsWith("http"))) {
+      try {
+        const res = await axios.post(`${apiUrl}/comments`, {
+          postId: post.id,
+          userId: user.id,
+          userName: user.name,
+          body: commentBody,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        comment = res.data;
+        setComments((prev) => [...prev, res.data]);
+      } catch (error) {
+        console.error("Error submitting comment");
+        return;
+      }
+    }
+    if (commentImage && commentImage.startsWith("http")) {
+      try {
+        const res = await axios.post(`${apiUrl}/images`, {
+          type: "comments",
+          cardId: comment.id,
+          userId: user.id,
+          url: commentImage,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } catch (error) {
+        console.error("Error submitting comment");
+        return;
+      }
+    }
+    setCommentBody("");
+    setCommentImage(null);
+  }
 
   return (
     <div className="flex flex-col items-center bg-base-300 rounded-lg w-[100%] my-5">
@@ -117,36 +161,40 @@ export default function PostCard({ post, posts, setPosts }) {
           <div>No Comments.</div>
         ))}
       {/* comment input section */}
-      <div className="flex flex-col items-center border rounded-lg w-[100%] p-2 mt-2">
+      <form
+        className="flex flex-col items-center border rounded-lg w-[100%] p-2 mt-2"
+        onSubmit={handleCommentSubmit}
+      >
         <div className="flex flex-row justify-between items-center gap-2 w-[100%]">
           <input
             className="ml-2 w-[80%] focus:outline-none"
             type="text"
             placeholder="add comment ..."
+            value={commentBody}
+            onChange={(e) => setCommentBody(e.target.value)}
           />
-          {/* file upload hidden*/}
+          {/* image url input */}
           <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleImageSelect}
-            className="hidden"
+            type="text"
+            placeholder="Image URL (optional)"
+            value={commentImage || ""}
+            onChange={(e) => setCommentImage(e.target.value)}
+            className="ml-2 w-[40%] focus:outline-none border-l pl-1"
           />
-          {/* file upload activate */}
           <button
-            onClick={() => fileInputRef.current.click()}
-            className="cursor-pointer text-primary"
+            type="submit"
+            className="cursor-pointer rounded-full text-primary"
+            disabled={commentBody.trim() === "" && !commentImage}
+            onClick={handleCommentSubmit}
           >
-            <ImageSVG />
-          </button>
-          <button className="cursor-pointer rounded-full text-primary">
             <SubmitSVG />
           </button>
         </div>
-        {commentImage && (
+        {commentImage && commentImage.startsWith("http") && (
           <div className="relative">
             <img src={commentImage} alt="img" className="h-30 w-30" />
             <button
+              type="button"
               onClick={() => setCommentImage(null)}
               className="absolute top-0 right-1 font-bold cursor-pointer hover:scale-110"
             >
@@ -154,7 +202,7 @@ export default function PostCard({ post, posts, setPosts }) {
             </button>
           </div>
         )}
-      </div>
+      </form>
     </div>
   );
 }

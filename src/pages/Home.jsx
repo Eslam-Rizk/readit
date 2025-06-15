@@ -158,12 +158,12 @@ export default function Home() {
       </div>
       {/* Main Content */}
       <div className="flex flex-col items-center col-span-1 md:col-span-4 lg:col-span-6 w-full max-w-2xl mx-auto">
-        <AddPost type={"posts"} user={user} setPosts={setPosts} />
+        <AddPost type={"posts"} user={user} setData={setPosts} />
         {postsLoading
           ? skeletons.map((skeleton) => <PostSkeleton key={skeleton} />)
           : posts.map((post) => (
               <div key={post.id} className="w-full mb-4">
-                <PostCard post={post} posts={posts} setPosts={setPosts} />
+                <PostCard user={user} post={post} posts={posts} setPosts={setPosts} />
               </div>
             ))}
       </div>

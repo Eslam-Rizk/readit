@@ -3,9 +3,10 @@ import ImageSVG from "./ImageSVG";
 import SubmitSVG from "./SubmitSVG";
 import axios from "axios";
 import { toast } from "react-toastify";
+import CloseSVG from "./CloseSVG";
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function AddPost({ type, user, setPosts }) {
+export default function AddPost({ type, user, setData }) {
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const CHAR_LIMIT = 280;
@@ -52,7 +53,7 @@ export default function AddPost({ type, user, setPosts }) {
         return;
       }
     }
-    setPosts((prev) => [post, ...prev]);
+    setData((prev) => [post, ...prev]);
   }
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -101,12 +102,16 @@ export default function AddPost({ type, user, setPosts }) {
           </button>
         </div>
       </div>
-      {image && (
-        <img
-          src={image}
-          alt="Preview"
-          className="max-h-48 rounded border mt-2"
-        />
+      {image && image.startsWith("http") && (
+        <div className="relative">
+          <img src={image} alt="Preview" className=" rounded border mt-2" />
+          <button
+            onClick={() => setImage(null)}
+            className="absolute top-1 right-1 font-bold cursor-pointer hover:scale-110"
+          >
+            <CloseSVG />
+          </button>
+        </div>
       )}
     </form>
   );
