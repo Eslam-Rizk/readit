@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import PosterDetails from "./PosterDetails";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function CommentCard({ comment }) {
+export default function CommentCard({ comment, comments, setComments }) {
   const [imgs, setImgs] = useState([]);
 
   useEffect(() => {
     async function getCommentImages(id) {
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/images?type=comments&cardId=${id}`
+          `${apiUrl}/images?type=comments&cardId=${id}`
         );
         setImgs(res.data);
       } catch (error) {
@@ -23,9 +24,12 @@ export default function CommentCard({ comment }) {
     <div className="flex flex-col items-center border-t gap-5 ">
       <div className="flex w-[100%]">
         <PosterDetails
-          userName={comment.userFullName}
+          userName={comment.userName}
           date={comment.createdAt}
           userId={comment.userId}
+          type={"comments"}
+          id={comment.id}
+          setData={setComments}
         />
       </div>
       <div className="flex flex-col">

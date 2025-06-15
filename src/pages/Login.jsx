@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { useUser } from "../contexts/userContext";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Define schema using zod
 const loginSchema = z.object({
@@ -40,7 +41,7 @@ function Login() {
     setError(null);
     let res;
     try {
-      res = await axios.post(`${process.env.REACT_APP_SERVER_URL}/login`, {
+      res = await axios.post(`${apiUrl}/login`, {
         email: data.email,
         password: data.password,
       });

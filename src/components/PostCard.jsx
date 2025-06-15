@@ -8,13 +8,14 @@ import ImageModal from "./ImageModal";
 import CloseSVG from "./CloseSVG";
 import ImageSVG from "./ImageSVG";
 import SubmitSVG from "./SubmitSVG";
+import CommentsSVG from "./CommentsSVG";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function PostCard({ post }) {
+export default function PostCard({ post, posts, setPosts }) {
   const fileInputRef = useRef(null);
   const [postImages, setPostImages] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState([]);
-  const [iscommentsLoading, setIsCommentsLoading] = useState(false);
   const [commentImage, setCommentImage] = useState(null);
 
   async function toggleComments() {
@@ -37,7 +38,7 @@ export default function PostCard({ post }) {
     async function getPostImages() {
       try {
         const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/images?type=posts&cardId=${post.id}`
+          `${apiUrl}/images?type=posts&cardId=${post.id}`
         );
         setPostImages(res.data);
       } catch (error) {
@@ -46,9 +47,7 @@ export default function PostCard({ post }) {
     }
     async function getPostComments() {
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/comments?postId=${post.id}`
-        );
+        const res = await axios.get(`${apiUrl}/comments?postId=${post.id}`);
         setComments(res.data);
       } catch (error) {
         console.error("error fetching comments");
@@ -63,9 +62,12 @@ export default function PostCard({ post }) {
       <div className="flex w-[100%]">
         {/* post user details */}
         <PosterDetails
-          userName={post.userFullName}
+          userName={post.userName}
           date={post.createdAt}
           userId={post.userId}
+          type={"posts"}
+          id={post.id}
+          setData={setPosts}
         />
       </div>
       {/* post content */}
@@ -96,20 +98,7 @@ export default function PostCard({ post }) {
         onClick={toggleComments}
         className="flex text-primary m-2 cursor-pointer mr-auto"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-6"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"
-          />
-        </svg>
+        <CommentsSVG />
         <p>{comments.length}</p>
       </button>
       {/* comments section */}
@@ -117,7 +106,11 @@ export default function PostCard({ post }) {
         (comments.length > 0 ? (
           comments.map((comment) => (
             <div key={comment.id} className="w-[100%] my-1">
-              <CommentCard comment={comment} />
+              <CommentCard
+                comment={comment}
+                comments={comments}
+                setComments={setComments}
+              />
             </div>
           ))
         ) : (

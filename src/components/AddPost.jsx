@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import ImageSVG from "./ImageSVG";
 import SubmitSVG from "./SubmitSVG";
+import axios from "axios";
+import { toast } from "react-toastify";
+const apiUrl = import.meta.env.VITE_API_URL;
 
-export default function AddPost() {
+export default function AddPost({ type, user, setPosts }) {
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const CHAR_LIMIT = 280;
@@ -15,12 +18,50 @@ export default function AddPost() {
     }
   };
 
+  async function addPost() {
+    let post;
+    try {
+      const res = await axios.post(`${apiUrl}/${type}`, {
+        body: text,
+        userId: user.id,
+        userName: user.name,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      console.log(res.data);
+      post = res.data;
+    } catch (error) {
+      console.error("Error Adding post", error);
+      toast.error("Error adding post, please try again!");
+      return;
+    }
+    if (image) {
+      try {
+        const res = await axios.post(`${apiUrl}/images`, {
+          type: type,
+          cardId: post.id,
+          userId: user.id,
+          url: image,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        console.log(res.data);
+      } catch (error) {
+        console.error("Error Adding post", error);
+        toast.error("Error adding post image, please try again!");
+        return;
+      }
+    }
+    setPosts((prev) => [post, ...prev]);
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission logic here
+    addPost();
     setText("");
     setImage(null);
   };
+
+  const isDisabled = text.trim() === "" && !image;
 
   return (
     <form
@@ -41,8 +82,39 @@ export default function AddPost() {
       >
         {text.length}/{CHAR_LIMIT}
       </div>
-
       <div className="flex justify-between items-center gap-4">
+        <input
+          type="text"
+          className="input input-bordered w-full"
+          placeholder="Image URL (optional)"
+          value={image || ""}
+          onChange={(e) => setImage(e.target.value)}
+        />
+
+        <div className="flex justify-end items-center gap-4">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={isDisabled}
+          >
+            <SubmitSVG />{" "}
+          </button>
+        </div>
+      </div>
+      {image && (
+        <img
+          src={image}
+          alt="Preview"
+          className="max-h-48 rounded border mt-2"
+        />
+      )}
+    </form>
+  );
+}
+
+//[TODO]: replace image url with uploaded image
+/*
+<div className="flex justify-between items-center gap-4">
         <label className="cursor-pointer flex items-center text-primary">
           <ImageSVG />
           <input
@@ -56,13 +128,4 @@ export default function AddPost() {
           <SubmitSVG />{" "}
         </button>
       </div>
-      {image && (
-        <img
-          src={URL.createObjectURL(image)}
-          alt="Preview"
-          className="max-h-48 rounded border mt-2"
-        />
-      )}
-    </form>
-  );
-}
+*/

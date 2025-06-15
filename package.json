@@ -1,14 +1,11 @@
 {
   "name": "readit",
-  "version": "0.0.0",
   "private": true,
-  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
-  "license": "ISC",
-  "author": "",
+  "version": "0.0.0",
   "type": "module",
-  "main": "eslint.config.js",
   "scripts": {
-    "dev": "vite",
+    "start:server": "json-server ../db.json -m ./node_modules/json-server-auth",
+    "dev": "concurrently \"vite\" \"npm run start:server\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

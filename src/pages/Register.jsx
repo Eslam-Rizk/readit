@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const schema = z
   .object({
@@ -48,7 +49,7 @@ export default function Register() {
     try {
       // Check if email already exists
       const res = await axios.get(
-        `${process.env.REACT_APP_SERVER_URL}/users`,
+        `${apiUrl}/users`,
         { params: { email: data.email } }
       );
       if (res.data.length > 0) {
@@ -57,7 +58,7 @@ export default function Register() {
       }
 
       // Register user
-      await axios.post(`${process.env.REACT_APP_SERVER_URL}/register`, {
+      await axios.post(`${apiUrl}/register`, {
         name: data.name,
         email: data.email,
         password: data.password,

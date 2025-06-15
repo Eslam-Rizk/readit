@@ -10,15 +10,17 @@ import { Link } from "react-router";
 import ThemeButton from "../components/ThemeButton";
 import AddPost from "../components/AddPost";
 import { useUser } from "../contexts/userContext";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function Home() {
   const { user } = useUser();
   const [postsLoading, setPostsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [following, setFollowing] = useState(0);
-  const [followers, setFollowers] = useState(0);
-  const [media, setMedia] = useState(0);
-  const [userPosts, setUserPosts] = useState(0);
+  const [following, setFollowing] = useState([]);
+  const [followers, setFollowers] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [media, setMedia] = useState([]);
+  const [userPosts, setUserPosts] = useState([]);
 
   const skeletons = ArrayFromNum(5);
 
@@ -32,49 +34,66 @@ export default function Home() {
       try {
         // Add artificial delay before making the request
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        const res = await axios.get(`${process.env.REACT_APP_SERVER_URL}/posts`);
-        setPosts(res.data);
+        const res = await axios.get(`${apiUrl}/posts`);
+        // Sort posts from newest to oldest by createdAt
+        const sortedPosts = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setPosts(sortedPosts);
         setPostsLoading(false);
-        if (user) getUserPosts(res.data);
+        if (user) getUserPosts(sortedPosts);
       } catch (error) {
         console.error("error fetching posts");
       }
     }
     async function getFollowings(id) {
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/followings?userId=${id}`
-        );
-        console.log("following:", res.data.length);
-        setFollowing(res.data.length);
+        const res = await axios.get(`${apiUrl}/followings?userId=${id}`);
+        console.log("following:", res.data);
+        setFollowing(res.data);
       } catch (error) {
         console.error("error fetching followings", error);
       }
     }
     async function getFollowers(id) {
       try {
-        const res = await axios.get(
-          `${process.env.REACT_APP_SERVER_URL}/followings?followingId=${id}`
-        );
-        console.log("followers:", res.data.length);
-        setFollowers(res.data.length);
+        const res = await axios.get(`${apiUrl}/followings?followingId=${id}`);
+        console.log("followers:", res.data);
+        setFollowers(res.data);
       } catch (error) {
         console.error("error fetching followers", error);
       }
     }
-    async function getMedia() {
+    async function getComments(id) {
       try {
-          `${process.env.REACT_APP_SERVER_URL}/images?userId=${id}`
+        const res = await axios.get(`${apiUrl}/comments?userId=${id}`);
+        console.log("comments:", res.data);
+        setComments(res.data);
       } catch (error) {
-        
+        console.error("error fetching comments", error);
+      }
+    }
+    async function getMedia(id) {
+      try {
+        const res = await axios.get(`${apiUrl}/images?userId=${id}`);
+        console.log("media:", res.data);
+        setMedia(res.data);
+      } catch (error) {
+        console.error("error fetching media", error);
       }
     }
     getPosts();
     if (user) {
       getFollowings(user.id);
       getFollowers(user.id);
+      getComments(user.id);
+      getMedia(user.id);
     }
   }, []);
+
+  useEffect(() => {
+    console.log("posts changed", posts);
+  }, [posts]);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-10 gap-4 px-2 md:px-6">
@@ -106,31 +125,25 @@ export default function Home() {
                 <div className="flex flex-row justify-between gap-2">
                   <div className="flex flex-col items-center flex-1 stat p-0">
                     <div className="stat-title">Followers</div>
-                    <div className="stat-value text-sm">{followers || 0}</div>
+                    <div className="stat-value text-sm">{followers.length}</div>
                   </div>
                   <div className="flex flex-col items-center flex-1 stat p-0">
                     <div className="stat-title">Following</div>
-                    <div className="stat-value text-sm">{following || 0}</div>
+                    <div className="stat-value text-sm">{following.length}</div>
                   </div>
                 </div>
                 <div className=" stats stats-vertical mt-4 w-full">
                   <div className="flex flex-row justify-between items-center flex-1 stat">
                     <div className="stat-title">Posts</div>
-                    <div className="stat-value text-sm">
-                      {userPosts.length || 0}
-                    </div>
-                  </div>
-                  <div className="flex flex-row justify-between items-center flex-1 stat">
-                    <div className="stat-title">Groups</div>
-                    <div className="stat-value text-sm">3</div>
-                  </div>
-                  <div className="flex flex-row justify-between items-center flex-1 stat">
-                    <div className="stat-title">Media</div>
-                    <div className="stat-value text-sm">42</div>
+                    <div className="stat-value text-sm">{userPosts.length}</div>
                   </div>
                   <div className="flex flex-row justify-between items-center flex-1 stat">
                     <div className="stat-title">Comments</div>
-                    <div className="stat-value text-sm">321</div>
+                    <div className="stat-value text-sm">{comments.length}</div>
+                  </div>
+                  <div className="flex flex-row justify-between items-center flex-1 stat">
+                    <div className="stat-title">Media</div>
+                    <div className="stat-value text-sm">{media.length}</div>
                   </div>
                   <div className="flex flex-row justify-between items-center flex-1 stat">
                     <div className="stat-title">Theme</div>
@@ -145,12 +158,12 @@ export default function Home() {
       </div>
       {/* Main Content */}
       <div className="flex flex-col items-center col-span-1 md:col-span-4 lg:col-span-6 w-full max-w-2xl mx-auto">
-        <AddPost />
+        <AddPost type={"posts"} user={user} setPosts={setPosts} />
         {postsLoading
           ? skeletons.map((skeleton) => <PostSkeleton key={skeleton} />)
           : posts.map((post) => (
               <div key={post.id} className="w-full mb-4">
-                <PostCard post={post} />
+                <PostCard post={post} posts={posts} setPosts={setPosts} />
               </div>
             ))}
       </div>
