@@ -49,7 +49,7 @@ export default function Home() {
     async function getFollowings(id) {
       try {
         const res = await axios.get(`${apiUrl}/followings?userId=${id}`);
-        console.log("following:", res.data);
+        // //console.log("following:", res.data);
         setFollowing(res.data);
       } catch (error) {
         console.error("error fetching followings", error);
@@ -58,7 +58,7 @@ export default function Home() {
     async function getFollowers(id) {
       try {
         const res = await axios.get(`${apiUrl}/followings?followingId=${id}`);
-        console.log("followers:", res.data);
+        ////console.log("followers:", res.data);
         setFollowers(res.data);
       } catch (error) {
         console.error("error fetching followers", error);
@@ -67,7 +67,7 @@ export default function Home() {
     async function getComments(id) {
       try {
         const res = await axios.get(`${apiUrl}/comments?userId=${id}`);
-        console.log("comments:", res.data);
+        ////console.log("comments:", res.data);
         setComments(res.data);
       } catch (error) {
         console.error("error fetching comments", error);
@@ -76,7 +76,7 @@ export default function Home() {
     async function getMedia(id) {
       try {
         const res = await axios.get(`${apiUrl}/images?userId=${id}`);
-        console.log("media for user:",user, res.data);
+        // //console.log("media for user:",user, res.data);
         setMedia(res.data);
       } catch (error) {
         console.error("error fetching media", error);
@@ -92,7 +92,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    console.log("posts changed", posts);
+    //console.log("posts changed", posts);
   }, [posts]);
 
   return (

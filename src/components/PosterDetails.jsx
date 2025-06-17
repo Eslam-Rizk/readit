@@ -51,8 +51,12 @@ export default function PosterDetails({
     const confirmed = window.confirm("You really want to delete this?");
     if (!confirmed) return;
 
+    let postOrComment = null;
     try {
-      await axios.delete(`${apiUrl}/${type}/${id}`);
+      const res = await axios.delete(`${apiUrl}/${type}/${id}`);
+      postOrComment = res;
+      console.log(postOrComment);
+
       setData((prev) => prev.filter((item) => item.id !== id));
       toast.success(
         `${
@@ -62,6 +66,36 @@ export default function PosterDetails({
     } catch (error) {
       console.error(`Error deleting element from ${type}:`, error.message);
       toast.error(`Error deleting from ${type}, please try again!`);
+      return;
+    }
+    if (postOrComment) {
+      // check if has image too
+      try {
+        await axios.delete(`${apiUrl}/images/?type=${type}&cardId=${id}`);
+        console.log("Image deleted successfully.");
+      } catch (error) {
+        // if (error.response && error.response.status !== 404) {
+          console.error(`Error deleting image from ${type}:`, error.message);
+          toast.error(`Error deleting image from ${type}, please try again!`);
+        // }
+      }
+
+      if (type === "posts") {
+        try {
+          await axios.delete(`${apiUrl}/comments/?postId=${id}`);
+          console.log("Comment deleted successfully.");
+        } catch (error) {
+          // if (error.response && error.response.status !== 404) {
+            console.error(
+              `Error deleting comment from ${type}:`,
+              error.message
+            );
+            toast.error(
+              `Error deleting comment from ${type}, please try again!`
+            );
+          // }
+        }
+      }
     }
   }
   function handleHide(id) {

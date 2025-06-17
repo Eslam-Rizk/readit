@@ -31,7 +31,7 @@ export default function PostCard({ user, post, posts, setPosts }) {
         setCommentImage(reader.result);
       };
       reader.readAsDataURL(file);
-      console.log("image: ", file);
+      // console.log("image: ", file);
     }
   }
 
@@ -42,7 +42,7 @@ export default function PostCard({ user, post, posts, setPosts }) {
           `${apiUrl}/images?type=posts&cardId=${post.id}`
         );
         setPostImages(res.data);
-        console.log("postimages", res.data);
+        // console.log("postimages", res.data);
       } catch (error) {
         console.error("error fetching post images");
       }
@@ -61,7 +61,7 @@ export default function PostCard({ user, post, posts, setPosts }) {
 
   // Handle comment submit
   async function handleCommentSubmit(e) {
-    console.log("comment submit");
+    // console.log("comment submit");
 
     e.preventDefault();
     let comment;
@@ -81,7 +81,7 @@ export default function PostCard({ user, post, posts, setPosts }) {
         return;
       }
       if (commentImage && commentImage.startsWith("http")) {
-        console.log("image added", commentImage);
+        // console.log("image added", commentImage);
 
         try {
           const res = await axios.post(`${apiUrl}/images`, {

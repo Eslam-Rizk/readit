@@ -24,6 +24,8 @@ export default function AddPost({ type, user, setData }) {
     if (text || (image && image.startsWith("http"))) {
       try {
         const res = await axios.post(`${apiUrl}/${type}`, {
+          id: new Date().getTime(), //[TODO]: using for json server incremental id conflict, remove with real backend
+          type: type,
           body: text,
           userId: user.id,
           userName: user.name,
